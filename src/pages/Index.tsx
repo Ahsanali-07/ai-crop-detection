@@ -16,7 +16,7 @@ const tomatoEarlyBlight: Disease = {
   id: 'tomato-early-blight',
   name: 'Tomato Early Blight',
   confidence: 0.92,
-  description: 'Early blight is a common fungal disease that affects tomato plants. It's characterized by dark spots with concentric rings and yellowing around the spots.',
+  description: 'Early blight is a common fungal disease that affects tomato plants. It is characterized by dark spots with concentric rings and yellowing around the spots.',
   treatment: [
     'Remove and destroy all affected leaves to prevent spread.',
     'Apply a fungicide specifically labeled for early blight control.',
