@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Leaf, BookOpen, MessageCircle } from 'lucide-react';
+import { Leaf, LogIn } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export default function Header() {
   const [scrolled, setScrolled] = React.useState(false);
@@ -47,12 +48,13 @@ export default function Header() {
         </nav>
         
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-            <MessageCircle className="w-5 h-5" />
-          </Button>
-          <Button variant="outline" size="sm" className="hidden md:flex">
-            Login
-          </Button>
+          <ThemeToggle />
+          <Link to="/auth/login">
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground gap-2">
+              <LogIn className="w-4 h-4" />
+              Login
+            </Button>
+          </Link>
           <Button size="sm" className="bg-plant-500 hover:bg-plant-600 text-white">
             Get Started
           </Button>
