@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area,
@@ -11,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { ChevronDown, BarChart3, LineChart as LineChartIcon, PieChart as PieChartIcon, Calendar, Download, Share2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 // Mock data for disease trends
 const diseaseTrendData = [
