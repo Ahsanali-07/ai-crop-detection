@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Leaf, BookOpen, Award, ShieldCheck, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -9,6 +10,8 @@ import ImageUploader from '@/components/ui/ImageUploader';
 import ResultCard, { Disease } from '@/components/ui/ResultCard';
 import Assistant from '@/components/ui/Assistant';
 import KnowledgeCard, { KnowledgeItem } from '@/components/ui/KnowledgeCard';
+import VoiceRecognition from '@/components/ui/VoiceRecognition';
+import SocialContact from '@/components/ui/SocialContact';
 import { cn } from '@/lib/utils';
 
 // Mock disease data

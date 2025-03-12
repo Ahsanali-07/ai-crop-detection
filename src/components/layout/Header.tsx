@@ -1,13 +1,14 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Leaf, LogIn } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Leaf, LogIn, LayoutDashboard, BookOpen, MessageSquare, LineChart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export default function Header() {
   const [scrolled, setScrolled] = React.useState(false);
+  const location = useLocation();
   
   React.useEffect(() => {
     const handleScroll = () => {
@@ -43,8 +44,22 @@ export default function Header() {
         
         <nav className="hidden md:flex items-center gap-6">
           <NavLink to="/" exact>Home</NavLink>
-          <NavLink to="/knowledge">Knowledge</NavLink>
-          <a href="#assistant" className="font-medium text-muted-foreground hover:text-foreground transition-colors">Assistant</a>
+          <NavLink to="/dashboard">
+            <LayoutDashboard className="w-4 h-4 mr-1" />
+            Dashboard
+          </NavLink>
+          <NavLink to="/knowledge">
+            <BookOpen className="w-4 h-4 mr-1" />
+            Knowledge
+          </NavLink>
+          <a href="#assistant" className="font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center">
+            <MessageSquare className="w-4 h-4 mr-1" />
+            Assistant
+          </a>
+          <a href="#insights" className="font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center">
+            <LineChart className="w-4 h-4 mr-1" />
+            Insights
+          </a>
         </nav>
         
         <div className="flex items-center gap-3">
@@ -71,14 +86,15 @@ type NavLinkProps = {
 };
 
 function NavLink({ to, exact, children }: NavLinkProps) {
-  const path = window.location.pathname;
+  const location = useLocation();
+  const path = location.pathname;
   const isActive = exact ? path === to : path.startsWith(to);
   
   return (
     <Link 
       to={to} 
       className={cn(
-        "font-medium transition-colors relative",
+        "font-medium transition-colors relative flex items-center",
         isActive 
           ? "text-foreground after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-0.5 after:bg-plant-500 after:rounded-full" 
           : "text-muted-foreground hover:text-foreground"
