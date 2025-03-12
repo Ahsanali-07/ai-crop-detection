@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/hooks/use-theme";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Knowledge from "./pages/Knowledge";
+import Insights from "./pages/Insights";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/knowledge" element={<Knowledge />} />
+            <Route path="/insights" element={<Insights />} />
             <Route path="/auth/login" element={<Login />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

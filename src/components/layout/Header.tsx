@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Leaf, LogIn, LayoutDashboard, BookOpen, MessageSquare, LineChart } from 'lucide-react';
+import { Leaf, LogIn, LayoutDashboard, BookOpen, MessageSquare, LineChart, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -29,7 +29,7 @@ export default function Header() {
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300 ease-in-out",
         scrolled 
-          ? "py-2 card-glass border-b border-white/10 shadow-sm" 
+          ? "py-2 card-glass border-b border-white/10 shadow-sm bg-background/80 backdrop-blur-md" 
           : "py-4 bg-transparent"
       )}
     >
@@ -48,6 +48,10 @@ export default function Header() {
             <LayoutDashboard className="w-4 h-4 mr-1" />
             Dashboard
           </NavLink>
+          <NavLink to="/insights">
+            <BarChart3 className="w-4 h-4 mr-1" />
+            Insights
+          </NavLink>
           <NavLink to="/knowledge">
             <BookOpen className="w-4 h-4 mr-1" />
             Knowledge
@@ -55,10 +59,6 @@ export default function Header() {
           <a href="#assistant" className="font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center">
             <MessageSquare className="w-4 h-4 mr-1" />
             Assistant
-          </a>
-          <a href="#insights" className="font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center">
-            <LineChart className="w-4 h-4 mr-1" />
-            Insights
           </a>
         </nav>
         
