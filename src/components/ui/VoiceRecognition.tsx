@@ -29,6 +29,11 @@ const VoiceRecognition = () => {
     
     // Create speech recognition instance
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setSupportsSpeechRecognition(false);
+      return;
+    }
+    
     const recognition = new SpeechRecognition();
     
     recognition.continuous = false;
@@ -38,7 +43,7 @@ const VoiceRecognition = () => {
       console.log('Voice recognition started');
     };
     
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
       const current = event.resultIndex;
       const transcript = event.results[current][0].transcript;
       setTranscript(transcript);
@@ -49,7 +54,7 @@ const VoiceRecognition = () => {
       processVoiceInput(transcript);
     };
     
-    recognition.onerror = (event) => {
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error('Speech recognition error', event.error);
       setIsListening(false);
       toast({
@@ -62,7 +67,7 @@ const VoiceRecognition = () => {
     recognition.start();
   };
   
-  const processVoiceInput = (input) => {
+  const processVoiceInput = (input: string) => {
     if (!input.trim()) return;
     
     setIsResponding(true);
