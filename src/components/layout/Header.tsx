@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Leaf, LogIn, LayoutDashboard, BookOpen, MessageSquare, LineChart, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export default function Header() {
-  const [scrolled, setScrolled] = React.useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [supportsVoice, setSupportsVoice] = useState(true);
   const location = useLocation();
   
-  React.useEffect(() => {
+  useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10;
       if (isScrolled !== scrolled) {
@@ -19,6 +20,12 @@ export default function Header() {
     };
 
     document.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Check if browser supports SpeechRecognition
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      setSupportsVoice(false);
+    }
+    
     return () => {
       document.removeEventListener('scroll', handleScroll);
     };
