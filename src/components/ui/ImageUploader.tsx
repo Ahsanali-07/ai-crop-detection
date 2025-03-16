@@ -3,6 +3,9 @@ import React, { useState, useRef } from 'react';
 import { Upload, Image as ImageIcon, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 type ImageUploaderProps = {
   onImageSelect: (image: File) => void;
@@ -13,6 +16,8 @@ export default function ImageUploader({ onImageSelect, isAnalyzing = false }: Im
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -23,7 +28,24 @@ export default function ImageUploader({ onImageSelect, isAnalyzing = false }: Im
 
   const processFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file.');
+      toast.error('Please select an image file.');
+      return;
+    }
+    
+    // Check if the user is authenticated
+    if (!user) {
+      toast.error('Please login to analyze plant images.', {
+        action: {
+          label: 'Login',
+          onClick: () => navigate('/auth/login')
+        }
+      });
+      return;
+    }
+    
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File size must be less than 10MB');
       return;
     }
     

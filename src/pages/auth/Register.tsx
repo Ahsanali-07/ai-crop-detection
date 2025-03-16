@@ -9,34 +9,40 @@ import { Link, useNavigate } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 
-export default function Login() {
+export default function Register() {
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
+  const [fullName, setFullName] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
   const navigate = useNavigate()
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!email || !password) {
-      toast.error("Please enter both email and password")
+    if (!email || !password || !fullName) {
+      toast.error("Please fill in all fields")
       return
     }
     
     try {
       setLoading(true)
       
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signUp({
         email,
-        password
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          }
+        }
       })
       
       if (error) throw error
       
-      toast.success("Logged in successfully!")
-      navigate("/dashboard")
+      toast.success("Registration successful! Please check your email for verification.")
+      navigate("/auth/login")
     } catch (error: any) {
-      toast.error(error.message || "An error occurred during login")
+      toast.error(error.message || "An error occurred during registration")
     } finally {
       setLoading(false)
     }
@@ -51,11 +57,22 @@ export default function Login() {
               <Leaf className="h-6 w-6 text-plant-600 dark:text-plant-400" />
             </div>
           </div>
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
+          <CardTitle className="text-2xl">Create an account</CardTitle>
+          <CardDescription>Enter your details to register</CardDescription>
         </CardHeader>
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleRegister}>
           <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input 
+                id="fullName" 
+                type="text" 
+                placeholder="Enter your full name" 
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input 
@@ -72,7 +89,7 @@ export default function Login() {
               <Input 
                 id="password" 
                 type="password" 
-                placeholder="Enter your password" 
+                placeholder="Create a password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -85,12 +102,12 @@ export default function Login() {
               className="w-full bg-plant-500 hover:bg-plant-600"
               disabled={loading}
             >
-              {loading ? "Signing In..." : "Sign In"}
+              {loading ? "Creating Account..." : "Sign Up"}
             </Button>
             <p className="text-sm text-muted-foreground text-center">
-              Don't have an account?{" "}
-              <Link to="/auth/register" className="text-plant-600 hover:text-plant-700 dark:text-plant-400 dark:hover:text-plant-300">
-                Sign up
+              Already have an account?{" "}
+              <Link to="/auth/login" className="text-plant-600 hover:text-plant-700 dark:text-plant-400 dark:hover:text-plant-300">
+                Sign in
               </Link>
             </p>
           </CardFooter>

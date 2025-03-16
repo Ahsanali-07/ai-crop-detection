@@ -9,6 +9,195 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      crop_distribution: {
+        Row: {
+          id: string
+          name: string
+          value: number
+        }
+        Insert: {
+          id?: string
+          name: string
+          value: number
+        }
+        Update: {
+          id?: string
+          name?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      disease_trends: {
+        Row: {
+          early_blight: number
+          id: string
+          late_blight: number
+          month: string
+          powdery_mildew: number
+        }
+        Insert: {
+          early_blight: number
+          id?: string
+          late_blight: number
+          month: string
+          powdery_mildew: number
+        }
+        Update: {
+          early_blight?: number
+          id?: string
+          late_blight?: number
+          month?: string
+          powdery_mildew?: number
+        }
+        Relationships: []
+      }
+      knowledge_articles: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          excerpt: string | null
+          id: string
+          image_alt: string | null
+          image_url: string | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          image_alt?: string | null
+          image_url?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          image_alt?: string | null
+          image_url?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      message_history: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          response: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          response: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          response?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      plant_detections: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          description: string | null
+          disease_name: string | null
+          id: string
+          image_url: string | null
+          plant_type: string
+          prevention: string[] | null
+          severity: string | null
+          treatment: string[] | null
+          user_id: string | null
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          description?: string | null
+          disease_name?: string | null
+          id?: string
+          image_url?: string | null
+          plant_type: string
+          prevention?: string[] | null
+          severity?: string | null
+          treatment?: string[] | null
+          user_id?: string | null
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          description?: string | null
+          disease_name?: string | null
+          id?: string
+          image_url?: string | null
+          plant_type?: string
+          prevention?: string[] | null
+          severity?: string | null
+          treatment?: string[] | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      treatment_effectiveness: {
+        Row: {
+          effectiveness: number
+          id: string
+          treatment: string
+        }
+        Insert: {
+          effectiveness: number
+          id?: string
+          treatment: string
+        }
+        Update: {
+          effectiveness?: number
+          id?: string
+          treatment?: string
+        }
+        Relationships: []
+      }
       weather_data: {
         Row: {
           condition: string | null
@@ -36,6 +225,30 @@ export type Database = {
           location?: string | null
           temperature?: number
           timestamp?: string
+        }
+        Relationships: []
+      }
+      weather_impacts: {
+        Row: {
+          date: string
+          disease_index: number
+          humidity: number
+          id: string
+          temperature: number
+        }
+        Insert: {
+          date: string
+          disease_index: number
+          humidity: number
+          id?: string
+          temperature: number
+        }
+        Update: {
+          date?: string
+          disease_index?: number
+          humidity?: number
+          id?: string
+          temperature?: number
         }
         Relationships: []
       }

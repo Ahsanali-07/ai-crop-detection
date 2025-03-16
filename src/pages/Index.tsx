@@ -1,87 +1,58 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Leaf, BookOpen, Award, ShieldCheck, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ImageUploader from '@/components/ui/ImageUploader';
 import ResultCard, { Disease } from '@/components/ui/ResultCard';
 import Assistant from '@/components/ui/Assistant';
 import KnowledgeCard, { KnowledgeItem } from '@/components/ui/KnowledgeCard';
-import VoiceRecognition from '@/components/ui/VoiceRecognition';
-import SocialContact from '@/components/ui/SocialContact';
-import { cn } from '@/lib/utils';
-
-// Mock disease data
-const tomatoEarlyBlight: Disease = {
-  id: 'tomato-early-blight',
-  name: 'Tomato Early Blight',
-  confidence: 0.92,
-  description: 'Early blight is a common fungal disease that affects tomato plants. It is characterized by dark spots with concentric rings and yellowing around the spots.',
-  treatment: [
-    'Remove and destroy all affected leaves to prevent spread.',
-    'Apply a fungicide specifically labeled for early blight control.',
-    'Ensure proper spacing between plants to improve air circulation.',
-    'Water at the base of plants to keep foliage dry.',
-  ],
-  prevention: [
-    'Use disease-resistant varieties when possible.',
-    'Practice crop rotation, avoiding planting tomatoes in the same area for 3-4 years.',
-    'Provide adequate spacing between plants for good air circulation.',
-    'Use mulch to prevent soil splash onto leaves.',
-    'Keep garden free of plant debris where fungi can overwinter.',
-  ],
-  severity: 'medium',
-};
-
-// Mock knowledge base articles
-const knowledgeItems: KnowledgeItem[] = [
-  {
-    id: '1',
-    title: 'Understanding Common Tomato Diseases',
-    category: 'Disease Guide',
-    excerpt: 'Learn about the most common diseases affecting tomato plants, including early blight, late blight, and septoria leaf spot, with detailed identification and treatment information.',
-    imageSrc: 'https://images.unsplash.com/photo-1601383835394-c8679d76a254',
-    imageAlt: 'Tomato plants',
-    slug: 'understanding-tomato-diseases',
-  },
-  {
-    id: '2',
-    title: 'Organic Methods for Controlling Aphids',
-    category: 'Pest Control',
-    excerpt: 'Discover natural and organic methods to control aphid infestations on your crops without resorting to harmful chemical pesticides.',
-    imageSrc: 'https://images.unsplash.com/photo-1556012018-50c5c0da73bf',
-    imageAlt: 'Plant with aphids',
-    slug: 'organic-aphid-control',
-  },
-  {
-    id: '3',
-    title: 'Best Practices for Crop Rotation',
-    category: 'Farming Guide',
-    excerpt: 'Explore the benefits of crop rotation and learn how to implement an effective rotation schedule to improve soil health and reduce disease pressure.',
-    imageSrc: 'https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad',
-    imageAlt: 'Farm field with different crops',
-    slug: 'crop-rotation-best-practices',
-  },
-];
+import { useAuth } from '@/contexts/AuthContext';
+import { detectDisease } from '@/services/detection';
+import { getKnowledgeArticles } from '@/services/knowledge';
+import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 const Index = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<Disease | null>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
   
-  const handleImageSelect = (image: File) => {
+  // Fetch knowledge articles from Supabase
+  const { data: knowledgeItems = [] } = useQuery({
+    queryKey: ['knowledgeArticles'],
+    queryFn: getKnowledgeArticles,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+  
+  const handleImageSelect = async (image: File) => {
     setSelectedImage(image);
     setResult(null);
     
+    if (!user) {
+      toast.error('Please sign in to analyze plant images', {
+        action: {
+          label: 'Sign In',
+          onClick: () => navigate('/auth/login'),
+        },
+      });
+      return;
+    }
+    
     // Simulate image analysis
     setIsAnalyzing(true);
-    setTimeout(() => {
+    try {
+      const result = await detectDisease(image);
+      setResult(result);
+    } catch (error: any) {
+      toast.error(error.message || 'Error analyzing image');
+    } finally {
       setIsAnalyzing(false);
-      setResult(tomatoEarlyBlight);
-    }, 3000);
+    }
   };
 
   return (
@@ -117,8 +88,12 @@ const Index = () => {
                   Get Started
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-                <Button variant="outline" size="lg">
-                  Learn More
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  onClick={() => navigate(user ? '/dashboard' : '/auth/register')}
+                >
+                  {user ? 'Dashboard' : 'Create Account'}
                 </Button>
               </div>
             </div>
@@ -164,10 +139,7 @@ const Index = () => {
               {result ? (
                 <ResultCard disease={result} />
               ) : (
-                <div className={cn(
-                  "rounded-xl border border-border p-8 flex flex-col items-center justify-center text-center h-full",
-                  "bg-muted/40 animate-fade-up"
-                )}>
+                <div className="rounded-xl border border-border p-8 flex flex-col items-center justify-center text-center h-full bg-muted/40 animate-fade-up">
                   <div className="w-16 h-16 rounded-full bg-plant-100 flex items-center justify-center mb-6">
                     <Award className="w-6 h-6 text-plant-600" />
                   </div>
@@ -208,14 +180,14 @@ const Index = () => {
                   Explore our collection of articles, guides, and resources for plant care.
                 </p>
               </div>
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => navigate('/knowledge')}>
                 View All Resources
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {knowledgeItems.map((item) => (
+              {knowledgeItems.slice(0, 3).map((item) => (
                 <KnowledgeCard 
                   key={item.id} 
                   item={item}
@@ -236,10 +208,19 @@ const Index = () => {
                   Sign up for free and start using our AI-powered crop disease detection and management system today.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                  <Button size="lg" className="bg-white text-plant-700 hover:bg-plant-50">
-                    Get Started Now
+                  <Button 
+                    size="lg" 
+                    className="bg-white text-plant-700 hover:bg-plant-50"
+                    onClick={() => navigate(user ? '/dashboard' : '/auth/register')}
+                  >
+                    {user ? 'Go to Dashboard' : 'Get Started Now'}
                   </Button>
-                  <Button variant="outline" size="lg" className="border-white text-white hover:bg-plant-600">
+                  <Button 
+                    variant="outline" 
+                    size="lg" 
+                    className="border-white text-white hover:bg-plant-600"
+                    onClick={() => navigate('/knowledge')}
+                  >
                     Learn More
                   </Button>
                 </div>
