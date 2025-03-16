@@ -23,8 +23,8 @@ export default function KnowledgeCard({ item, className, featured = false }: Kno
   return (
     <div 
       className={cn(
-        "group rounded-xl overflow-hidden border border-border bg-card transition-all duration-300",
-        "hover:shadow-md hover:border-plant-200 dark:hover:border-plant-800",
+        "group rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/50 transition-all duration-300",
+        "hover:shadow-md hover:border-plant-700",
         featured ? "md:col-span-2" : "",
         className
       )}
@@ -36,7 +36,7 @@ export default function KnowledgeCard({ item, className, featured = false }: Kno
         <div className="relative overflow-hidden">
           <div className={cn(
             "absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10",
-            "opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            "opacity-50 group-hover:opacity-100 transition-opacity duration-300"
           )} />
           
           <img 
@@ -49,25 +49,25 @@ export default function KnowledgeCard({ item, className, featured = false }: Kno
           />
           
           <div className="absolute top-3 left-3 z-10">
-            <span className="px-2 py-1 bg-white/90 backdrop-blur-sm text-xs font-medium rounded-full">
+            <span className="px-2 py-1 bg-plant-600/80 text-white backdrop-blur-sm text-xs font-medium rounded-full">
               {item.category}
             </span>
           </div>
         </div>
         
         <div className="p-5">
-          <h3 className="text-lg font-semibold mb-2 line-clamp-2 group-hover:text-plant-700 dark:group-hover:text-plant-300 transition-colors">
+          <h3 className="text-lg font-semibold mb-2 line-clamp-2 text-white group-hover:text-plant-300 transition-colors">
             {item.title}
           </h3>
           
-          <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+          <p className="text-sm text-zinc-400 mb-4 line-clamp-3">
             {item.excerpt}
           </p>
           
           <Button 
             variant="outline" 
             size="sm"
-            className="group-hover:bg-plant-50 group-hover:text-plant-700 group-hover:border-plant-200 transition-colors"
+            className="group-hover:bg-plant-800 group-hover:text-plant-300 group-hover:border-plant-700 transition-colors"
           >
             <BookOpen className="mr-1 h-4 w-4" />
             Read more
