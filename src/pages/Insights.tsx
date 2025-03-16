@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { 
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
@@ -11,60 +12,168 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { ChevronDown, BarChart3, LineChart as LineChartIcon, PieChart as PieChartIcon, Calendar, Download, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-// Mock data for disease trends
-const diseaseTrendData = [
-  { month: 'Jan', earlyBlight: 65, lateBlight: 40, powderyMildew: 24 },
-  { month: 'Feb', earlyBlight: 59, lateBlight: 45, powderyMildew: 30 },
-  { month: 'Mar', earlyBlight: 80, lateBlight: 36, powderyMildew: 28 },
-  { month: 'Apr', earlyBlight: 81, lateBlight: 42, powderyMildew: 33 },
-  { month: 'May', earlyBlight: 56, lateBlight: 60, powderyMildew: 42 },
-  { month: 'Jun', earlyBlight: 55, lateBlight: 50, powderyMildew: 35 },
-  { month: 'Jul', earlyBlight: 40, lateBlight: 45, powderyMildew: 30 },
-  { month: 'Aug', earlyBlight: 30, lateBlight: 48, powderyMildew: 25 },
-  { month: 'Sep', earlyBlight: 35, lateBlight: 38, powderyMildew: 20 },
-  { month: 'Oct', earlyBlight: 45, lateBlight: 30, powderyMildew: 15 },
-  { month: 'Nov', earlyBlight: 50, lateBlight: 25, powderyMildew: 18 },
-  { month: 'Dec', earlyBlight: 58, lateBlight: 35, powderyMildew: 21 },
-];
-
-// Mock data for crop distribution
-const cropDistributionData = [
-  { name: 'Tomato', value: 35 },
-  { name: 'Potato', value: 25 },
-  { name: 'Wheat', value: 20 },
-  { name: 'Rice', value: 15 },
-  { name: 'Others', value: 5 },
-];
-
-// Mock data for treatment effectiveness
-const treatmentEffectivenessData = [
-  { treatment: 'Organic Fungicide', effectiveness: 75 },
-  { treatment: 'Chemical Fungicide', effectiveness: 90 },
-  { treatment: 'Crop Rotation', effectiveness: 65 },
-  { treatment: 'Resistant Varieties', effectiveness: 85 },
-  { treatment: 'Proper Spacing', effectiveness: 60 },
-  { treatment: 'Water Management', effectiveness: 70 },
-];
-
-// Mock weather impact data
-const weatherImpactData = [
-  { date: 'Week 1', humidity: 60, temperature: 25, diseaseIndex: 45 },
-  { date: 'Week 2', humidity: 70, temperature: 28, diseaseIndex: 65 },
-  { date: 'Week 3', humidity: 80, temperature: 30, diseaseIndex: 85 },
-  { date: 'Week 4', humidity: 75, temperature: 29, diseaseIndex: 75 },
-  { date: 'Week 5', humidity: 65, temperature: 26, diseaseIndex: 55 },
-  { date: 'Week 6', humidity: 55, temperature: 23, diseaseIndex: 35 },
-  { date: 'Week 7', humidity: 60, temperature: 24, diseaseIndex: 40 },
-  { date: 'Week 8', humidity: 70, temperature: 27, diseaseIndex: 60 },
-];
+import { useToast } from '@/hooks/use-toast';
+import { 
+  generateDiseaseTrendData,
+  generateCropDistributionData,
+  generateTreatmentEffectivenessData, 
+  generateWeatherImpactData,
+  exportToCSV
+} from '@/utils/dataGenerators';
+import { supabase } from "@/integrations/supabase/client";
 
 // Colors for pie chart
 const COLORS = ['#4CAF50', '#8BC34A', '#CDDC39', '#FFC107', '#FF9800'];
 
 const Insights = () => {
+  const { toast } = useToast();
   const [timeRange, setTimeRange] = useState('year');
   const [cropType, setCropType] = useState('all');
+  const [activeTab, setActiveTab] = useState('trends');
+  
+  // State for chart data
+  const [diseaseTrendData, setDiseaseTrendData] = useState(generateDiseaseTrendData());
+  const [cropDistributionData, setCropDistributionData] = useState(generateCropDistributionData());
+  const [treatmentEffectivenessData, setTreatmentEffectivenessData] = useState(generateTreatmentEffectivenessData());
+  const [weatherImpactData, setWeatherImpactData] = useState(generateWeatherImpactData());
+
+  // Generate new data on component mount
+  useEffect(() => {
+    regenerateData();
+    fetchDataFromSupabase();
+  }, []);
+
+  // Apply filters when timeRange or cropType changes
+  useEffect(() => {
+    applyFilters();
+  }, [timeRange, cropType]);
+
+  // Fetch data from Supabase if available
+  const fetchDataFromSupabase = async () => {
+    try {
+      // Try to fetch disease trends data
+      const { data: trendData, error: trendError } = await supabase
+        .from('disease_trends')
+        .select('*');
+      
+      if (trendData && trendData.length > 0 && !trendError) {
+        setDiseaseTrendData(trendData);
+      }
+      
+      // Try to fetch crop distribution data
+      const { data: cropData, error: cropError } = await supabase
+        .from('crop_distribution')
+        .select('*');
+      
+      if (cropData && cropData.length > 0 && !cropError) {
+        setCropDistributionData(cropData);
+      }
+      
+      // Try to fetch treatment effectiveness data
+      const { data: treatmentData, error: treatmentError } = await supabase
+        .from('treatment_effectiveness')
+        .select('*');
+      
+      if (treatmentData && treatmentData.length > 0 && !treatmentError) {
+        setTreatmentEffectivenessData(treatmentData);
+      }
+      
+      // Try to fetch weather impact data
+      const { data: weatherData, error: weatherError } = await supabase
+        .from('weather_impacts')
+        .select('*');
+      
+      if (weatherData && weatherData.length > 0 && !weatherError) {
+        setWeatherImpactData(weatherData);
+      }
+    } catch (error) {
+      console.error('Error fetching data from Supabase:', error);
+      // If there's an error, we'll use the generated data
+    }
+  };
+
+  // Regenerate all chart data
+  const regenerateData = () => {
+    setDiseaseTrendData(generateDiseaseTrendData());
+    setCropDistributionData(generateCropDistributionData());
+    setTreatmentEffectivenessData(generateTreatmentEffectivenessData());
+    setWeatherImpactData(generateWeatherImpactData());
+    
+    toast({
+      title: "Data refreshed",
+      description: "Chart data has been regenerated",
+    });
+  };
+
+  // Apply filters based on timeRange and cropType
+  const applyFilters = () => {
+    // Filter disease trend data based on time range
+    let filteredDiseaseTrendData = generateDiseaseTrendData();
+    if (timeRange === 'month') {
+      filteredDiseaseTrendData = filteredDiseaseTrendData.slice(0, 1);
+    } else if (timeRange === 'quarter') {
+      filteredDiseaseTrendData = filteredDiseaseTrendData.slice(0, 3);
+    } else if (timeRange === 'year') {
+      // Use all data
+    }
+
+    // Filter crop distribution data based on crop type
+    let filteredCropDistribution = generateCropDistributionData();
+    if (cropType !== 'all') {
+      // Focus on the selected crop by increasing its value
+      filteredCropDistribution = filteredCropDistribution.map(item => {
+        if (item.name.toLowerCase() === cropType) {
+          return { ...item, value: item.value * 1.5 };
+        }
+        return item;
+      });
+    }
+
+    setDiseaseTrendData(filteredDiseaseTrendData);
+    setCropDistributionData(filteredCropDistribution);
+    setTreatmentEffectivenessData(generateTreatmentEffectivenessData());
+    setWeatherImpactData(generateWeatherImpactData());
+    
+    toast({
+      title: "Filters applied",
+      description: `Time range: ${timeRange}, Crop type: ${cropType}`,
+    });
+  };
+
+  // Handle download button click
+  const handleDownload = () => {
+    let dataToExport;
+    let filename;
+    
+    switch (activeTab) {
+      case 'trends':
+        dataToExport = diseaseTrendData;
+        filename = `disease_trends_${timeRange}`;
+        break;
+      case 'distribution':
+        dataToExport = cropDistributionData;
+        filename = `crop_distribution_${cropType}`;
+        break;
+      case 'effectiveness':
+        dataToExport = treatmentEffectivenessData;
+        filename = 'treatment_effectiveness';
+        break;
+      case 'weather':
+        dataToExport = weatherImpactData;
+        filename = 'weather_impacts';
+        break;
+      default:
+        dataToExport = diseaseTrendData;
+        filename = 'crop_insights';
+    }
+    
+    exportToCSV(dataToExport, filename);
+    
+    toast({
+      title: "Download started",
+      description: `${filename}.csv is being downloaded`,
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -81,7 +190,7 @@ const Insights = () => {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-3">
-              <Select defaultValue={timeRange} onValueChange={setTimeRange}>
+              <Select defaultValue={timeRange} value={timeRange} onValueChange={setTimeRange}>
                 <SelectTrigger className="w-[180px]">
                   <Calendar className="mr-2 h-4 w-4" />
                   <SelectValue placeholder="Select time range" />
@@ -94,7 +203,7 @@ const Insights = () => {
                 </SelectContent>
               </Select>
               
-              <Select defaultValue={cropType} onValueChange={setCropType}>
+              <Select defaultValue={cropType} value={cropType} onValueChange={setCropType}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Select crop type" />
                 </SelectTrigger>
@@ -107,17 +216,17 @@ const Insights = () => {
                 </SelectContent>
               </Select>
               
-              <Button variant="outline" size="icon" className="h-10 w-10">
+              <Button variant="outline" size="icon" className="h-10 w-10" onClick={handleDownload}>
                 <Download className="h-4 w-4" />
               </Button>
               
-              <Button variant="outline" size="icon" className="h-10 w-10">
+              <Button variant="outline" size="icon" className="h-10 w-10" onClick={regenerateData}>
                 <Share2 className="h-4 w-4" />
               </Button>
             </div>
           </div>
           
-          <Tabs defaultValue="trends" className="w-full">
+          <Tabs defaultValue="trends" value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid grid-cols-4 mb-8">
               <TabsTrigger value="trends" className="flex items-center">
                 <LineChartIcon className="mr-2 h-4 w-4" />
@@ -185,24 +294,24 @@ const Insights = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatCard 
                   title="Early Blight" 
-                  value="54%" 
-                  trend="+12%" 
+                  value={`${Math.floor(Math.random() * 30) + 40}%`} 
+                  trend={`${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 15) + 2}%`} 
                   description="Increase since last month" 
-                  trendDirection="up"
+                  trendDirection={Math.random() > 0.5 ? 'up' : 'down'}
                 />
                 <StatCard 
                   title="Late Blight" 
-                  value="38%" 
-                  trend="-5%" 
-                  description="Decrease since last month" 
-                  trendDirection="down"
+                  value={`${Math.floor(Math.random() * 30) + 30}%`} 
+                  trend={`${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 15) + 2}%`}
+                  description="Change since last month" 
+                  trendDirection={Math.random() > 0.5 ? 'up' : 'down'}
                 />
                 <StatCard 
                   title="Powdery Mildew" 
-                  value="26%" 
-                  trend="+3%" 
-                  description="Increase since last month" 
-                  trendDirection="up"
+                  value={`${Math.floor(Math.random() * 20) + 20}%`}
+                  trend={`${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 15) + 2}%`}
+                  description="Change since last month" 
+                  trendDirection={Math.random() > 0.5 ? 'up' : 'down'}
                 />
               </div>
             </TabsContent>
@@ -241,22 +350,15 @@ const Insights = () => {
                   <div className="w-full md:w-1/2 mt-6 md:mt-0 md:ml-6">
                     <h4 className="text-lg font-medium mb-4">Key Insights</h4>
                     <ul className="space-y-2">
-                      <li className="flex items-center">
-                        <div className="h-3 w-3 rounded-full bg-[#4CAF50] mr-2"></div>
-                        <span>Tomatoes make up the largest portion of analyzed crops at 35%</span>
-                      </li>
-                      <li className="flex items-center">
-                        <div className="h-3 w-3 rounded-full bg-[#8BC34A] mr-2"></div>
-                        <span>Potatoes are the second most common crop at 25%</span>
-                      </li>
-                      <li className="flex items-center">
-                        <div className="h-3 w-3 rounded-full bg-[#CDDC39] mr-2"></div>
-                        <span>Wheat accounts for 20% of all analyzed samples</span>
-                      </li>
-                      <li className="flex items-center">
-                        <div className="h-3 w-3 rounded-full bg-[#FFC107] mr-2"></div>
-                        <span>Rice represents 15% of the total crop distribution</span>
-                      </li>
+                      {cropDistributionData.map((item, index) => (
+                        <li key={index} className="flex items-center">
+                          <div 
+                            className="h-3 w-3 rounded-full mr-2" 
+                            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                          ></div>
+                          <span>{item.name} makes up {item.value}% of analyzed crops</span>
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </CardContent>
@@ -359,19 +461,19 @@ const Insights = () => {
                     <ul className="space-y-2">
                       <li className="flex justify-between items-center pb-2 border-b">
                         <span>Humidity correlation</span>
-                        <span className="font-medium">0.87 (Strong)</span>
+                        <span className="font-medium">{(Math.random() * 0.3 + 0.6).toFixed(2)} (Strong)</span>
                       </li>
                       <li className="flex justify-between items-center pb-2 border-b">
                         <span>Temperature correlation</span>
-                        <span className="font-medium">0.65 (Moderate)</span>
+                        <span className="font-medium">{(Math.random() * 0.3 + 0.5).toFixed(2)} (Moderate)</span>
                       </li>
                       <li className="flex justify-between items-center pb-2 border-b">
                         <span>Rainfall correlation</span>
-                        <span className="font-medium">0.72 (Strong)</span>
+                        <span className="font-medium">{(Math.random() * 0.3 + 0.6).toFixed(2)} (Strong)</span>
                       </li>
                       <li className="flex justify-between items-center">
                         <span>Wind speed correlation</span>
-                        <span className="font-medium">0.31 (Weak)</span>
+                        <span className="font-medium">{(Math.random() * 0.3 + 0.1).toFixed(2)} (Weak)</span>
                       </li>
                     </ul>
                   </CardContent>
@@ -391,7 +493,15 @@ const Insights = () => {
                           <p className="font-medium">Early Blight Risk</p>
                           <p className="text-sm text-muted-foreground">Next 7 days</p>
                         </div>
-                        <span className="px-3 py-1 rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 text-xs font-medium">High</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          Math.random() > 0.6 
+                            ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" 
+                            : Math.random() > 0.4 
+                              ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
+                              : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                        }`}>
+                          {Math.random() > 0.6 ? "High" : Math.random() > 0.4 ? "Medium" : "Low"}
+                        </span>
                       </div>
                       
                       <div className="flex items-center justify-between">
@@ -399,7 +509,15 @@ const Insights = () => {
                           <p className="font-medium">Late Blight Risk</p>
                           <p className="text-sm text-muted-foreground">Next 7 days</p>
                         </div>
-                        <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium">Medium</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          Math.random() > 0.6 
+                            ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" 
+                            : Math.random() > 0.4 
+                              ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
+                              : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                        }`}>
+                          {Math.random() > 0.6 ? "High" : Math.random() > 0.4 ? "Medium" : "Low"}
+                        </span>
                       </div>
                       
                       <div className="flex items-center justify-between">
@@ -407,7 +525,15 @@ const Insights = () => {
                           <p className="font-medium">Powdery Mildew Risk</p>
                           <p className="text-sm text-muted-foreground">Next 7 days</p>
                         </div>
-                        <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 text-xs font-medium">Low</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          Math.random() > 0.6 
+                            ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" 
+                            : Math.random() > 0.4 
+                              ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
+                              : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                        }`}>
+                          {Math.random() > 0.6 ? "High" : Math.random() > 0.4 ? "Medium" : "Low"}
+                        </span>
                       </div>
                     </div>
                   </CardContent>
