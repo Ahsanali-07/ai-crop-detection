@@ -59,25 +59,27 @@ export default function Header() {
           <span className="text-xl font-semibold tracking-tight text-foreground">PlantCare</span>
         </Link>
         
-        <nav className="hidden md:flex items-center gap-6">
-          <NavLink to="/" exact>Home</NavLink>
-          <NavLink to="/dashboard">
-            <LayoutDashboard className="w-4 h-4 mr-1" />
-            Dashboard
-          </NavLink>
-          <NavLink to="/insights">
-            <BarChart3 className="w-4 h-4 mr-1" />
-            Insights
-          </NavLink>
-          <NavLink to="/knowledge">
-            <BookOpen className="w-4 h-4 mr-1" />
-            Knowledge
-          </NavLink>
-          <a href="#assistant" className="font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center">
-            <MessageSquare className="w-4 h-4 mr-1" />
-            Assistant
-          </a>
-        </nav>
+        {user && (
+          <nav className="hidden md:flex items-center gap-6">
+            <NavLink to="/" exact>Home</NavLink>
+            <NavLink to="/dashboard">
+              <LayoutDashboard className="w-4 h-4 mr-1" />
+              Dashboard
+            </NavLink>
+            <NavLink to="/insights">
+              <BarChart3 className="w-4 h-4 mr-1" />
+              Insights
+            </NavLink>
+            <NavLink to="/knowledge">
+              <BookOpen className="w-4 h-4 mr-1" />
+              Knowledge
+            </NavLink>
+            <a href="#assistant" className="font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center">
+              <MessageSquare className="w-4 h-4 mr-1" />
+              Assistant
+            </a>
+          </nav>
+        )}
         
         <div className="flex items-center gap-3">
           <ThemeToggle />
