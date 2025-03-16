@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client"
 import { Disease } from "@/components/ui/ResultCard"
 import { uploadImage } from "./storage"
@@ -24,7 +25,7 @@ export async function detectDisease(image: File): Promise<Disease> {
         "Use mulch to prevent soil splash onto leaves.",
         "Keep garden free of plant debris where fungi can overwinter.",
       ],
-      severity: "medium",
+      severity: "medium" as const,
     },
     {
       id: "tomato-late-blight",
@@ -44,7 +45,7 @@ export async function detectDisease(image: File): Promise<Disease> {
         "Rotate crops on a 3-year cycle.",
         "Clean up all garden debris at the end of the season.",
       ],
-      severity: "high",
+      severity: "high" as const,
     },
     {
       id: "cucumber-powdery-mildew",
@@ -64,7 +65,7 @@ export async function detectDisease(image: File): Promise<Disease> {
         "Water at the base of plants in the morning.",
         "Practice crop rotation.",
       ],
-      severity: "low",
+      severity: "low" as const,
     },
     {
       id: "pepper-bacterial-spot",
@@ -84,7 +85,7 @@ export async function detectDisease(image: File): Promise<Disease> {
         "Clean tools and equipment between use.",
         "Choose resistant varieties when available.",
       ],
-      severity: "medium",
+      severity: "medium" as const,
     }
   ];
 
