@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area,
@@ -18,7 +17,9 @@ import {
   generateCropDistributionData,
   generateTreatmentEffectivenessData, 
   generateWeatherImpactData,
-  exportToCSV
+  exportToCSV,
+  transformSupabaseTrendData,
+  transformSupabaseWeatherData
 } from '@/utils/dataGenerators';
 import { supabase } from "@/integrations/supabase/client";
 
@@ -57,7 +58,9 @@ const Insights = () => {
         .select('*');
       
       if (trendData && trendData.length > 0 && !trendError) {
-        setDiseaseTrendData(trendData);
+        // Transform the data to match our frontend format
+        const transformedTrendData = transformSupabaseTrendData(trendData);
+        setDiseaseTrendData(transformedTrendData);
       }
       
       // Try to fetch crop distribution data
@@ -84,7 +87,9 @@ const Insights = () => {
         .select('*');
       
       if (weatherData && weatherData.length > 0 && !weatherError) {
-        setWeatherImpactData(weatherData);
+        // Transform the data to match our frontend format
+        const transformedWeatherData = transformSupabaseWeatherData(weatherData);
+        setWeatherImpactData(transformedWeatherData);
       }
     } catch (error) {
       console.error('Error fetching data from Supabase:', error);

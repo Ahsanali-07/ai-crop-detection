@@ -87,3 +87,27 @@ export const exportToCSV = (data: any[], filename: string) => {
   link.click();
   document.body.removeChild(link);
 };
+
+// Transform Supabase disease trend data to match our frontend format
+export const transformSupabaseTrendData = (data: any[]) => {
+  if (!data || !data.length) return [];
+  
+  return data.map(item => ({
+    month: item.month,
+    earlyBlight: item.early_blight,
+    lateBlight: item.late_blight,
+    powderyMildew: item.powdery_mildew
+  }));
+};
+
+// Transform Supabase weather impact data to match our frontend format
+export const transformSupabaseWeatherData = (data: any[]) => {
+  if (!data || !data.length) return [];
+  
+  return data.map(item => ({
+    date: item.date,
+    humidity: item.humidity,
+    temperature: item.temperature,
+    diseaseIndex: item.disease_index
+  }));
+};
