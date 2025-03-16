@@ -1,15 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Leaf, LogIn, LayoutDashboard, BookOpen, MessageSquare, LineChart, BarChart3 } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Leaf, LogIn, LogOut, LayoutDashboard, BookOpen, MessageSquare, LineChart, BarChart3, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [supportsVoice, setSupportsVoice] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -30,6 +34,12 @@ export default function Header() {
       document.removeEventListener('scroll', handleScroll);
     };
   }, [scrolled]);
+
+  const handleLogout = async () => {
+    await signOut();
+    toast.success("Logged out successfully");
+    navigate('/');
+  };
 
   return (
     <header 
@@ -71,15 +81,41 @@ export default function Header() {
         
         <div className="flex items-center gap-3">
           <ThemeToggle />
-          <Link to="/auth/login">
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground gap-2">
-              <LogIn className="w-4 h-4" />
-              Login
-            </Button>
-          </Link>
-          <Button size="sm" className="bg-plant-500 hover:bg-plant-600 text-white">
-            Get Started
-          </Button>
+          {user ? (
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-muted-foreground hover:text-foreground gap-2"
+                onClick={handleLogout}
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </Button>
+              <Button 
+                size="sm" 
+                className="bg-plant-500 hover:bg-plant-600 text-white"
+                onClick={() => navigate('/dashboard')}
+              >
+                <User className="w-4 h-4 mr-2" />
+                My Account
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Link to="/auth/login">
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground gap-2">
+                  <LogIn className="w-4 h-4" />
+                  Login
+                </Button>
+              </Link>
+              <Link to="/auth/register">
+                <Button size="sm" className="bg-plant-500 hover:bg-plant-600 text-white">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
