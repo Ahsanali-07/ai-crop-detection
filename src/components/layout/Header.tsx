@@ -97,7 +97,7 @@ export default function Header() {
               <Button 
                 size="sm" 
                 className="bg-plant-500 hover:bg-plant-600 text-white"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/account')}
               >
                 <User className="w-4 h-4 mr-2" />
                 My Account

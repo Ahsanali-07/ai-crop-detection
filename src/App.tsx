@@ -14,6 +14,7 @@ import Insights from "./pages/Insights";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import Account from "./pages/Account";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,11 @@ const App = () => (
               <Route path="/dashboard" element={
                 <PrivateRoute>
                   <Dashboard />
+                </PrivateRoute>
+              } />
+              <Route path="/account" element={
+                <PrivateRoute>
+                  <Account />
                 </PrivateRoute>
               } />
               <Route path="/knowledge" element={<Knowledge />} />

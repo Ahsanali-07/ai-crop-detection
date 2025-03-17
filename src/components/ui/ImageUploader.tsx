@@ -92,22 +92,33 @@ export default function ImageUploader({ onImageSelect, isAnalyzing = false }: Im
             "border-2 border-dashed rounded-xl p-8 transition-all duration-200 ease-in-out",
             "flex flex-col items-center justify-center text-center",
             isDragging 
-              ? "border-plant-400 bg-plant-50 dark:bg-plant-950/20" 
+              ? "border-plant-400 bg-plant-950/20" 
               : "border-border bg-background/50 hover:bg-background hover:border-muted-foreground/20"
           )}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          <div className="w-16 h-16 mb-4 rounded-full bg-plant-100 flex items-center justify-center">
-            <Upload className="w-6 h-6 text-plant-600" />
+          <div className="w-16 h-16 mb-4 rounded-full bg-plant-100 dark:bg-plant-900/30 flex items-center justify-center">
+            <Upload className="w-6 h-6 text-plant-600 dark:text-plant-400" />
           </div>
           <h3 className="text-lg font-medium mb-2">Upload a plant image</h3>
           <p className="text-muted-foreground text-sm mb-6 max-w-md">
             Drag and drop your image here, or click to browse. We support JPG, PNG and WebP images up to 10MB.
           </p>
           <Button
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => {
+              if (!user) {
+                toast.error('Please login to analyze plant images.', {
+                  action: {
+                    label: 'Login',
+                    onClick: () => navigate('/auth/login')
+                  }
+                });
+                return;
+              }
+              fileInputRef.current?.click();
+            }}
             className="bg-plant-500 hover:bg-plant-600 text-white"
           >
             Select Image
