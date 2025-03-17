@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Account from "./pages/Account";
+import Subscription from "./pages/Subscription";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,11 @@ const App = () => (
               <Route path="/account" element={
                 <PrivateRoute>
                   <Account />
+                </PrivateRoute>
+              } />
+              <Route path="/subscription" element={
+                <PrivateRoute>
+                  <Subscription />
                 </PrivateRoute>
               } />
               <Route path="/knowledge" element={<Knowledge />} />

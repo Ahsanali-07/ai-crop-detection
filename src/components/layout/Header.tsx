@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Leaf, LogIn, LogOut, LayoutDashboard, BookOpen, MessageSquare, LineChart, BarChart3, User } from 'lucide-react';
+import { Leaf, LogIn, LogOut, LayoutDashboard, BookOpen, MessageSquare, LineChart, BarChart3, User, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -73,6 +73,10 @@ export default function Header() {
             <NavLink to="/knowledge">
               <BookOpen className="w-4 h-4 mr-1" />
               Knowledge
+            </NavLink>
+            <NavLink to="/subscription">
+              <Crown className="w-4 h-4 mr-1" />
+              Subscription
             </NavLink>
             <a href="#assistant" className="font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center">
               <MessageSquare className="w-4 h-4 mr-1" />
