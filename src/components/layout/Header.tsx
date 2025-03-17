@@ -15,6 +15,10 @@ export default function Header() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   
+  // Get user subscription from localStorage - in a real app this would come from your database
+  const userSubscription = localStorage.getItem('userSubscription') || 'free';
+  const isPremium = userSubscription !== 'free';
+  
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10;
@@ -75,7 +79,7 @@ export default function Header() {
               Knowledge
             </NavLink>
             <NavLink to="/subscription">
-              <Crown className="w-4 h-4 mr-1" />
+              <Crown className={`w-4 h-4 mr-1 ${isPremium ? 'text-amber-400' : ''}`} />
               Subscription
             </NavLink>
             <a href="#assistant" className="font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center">
@@ -100,10 +104,11 @@ export default function Header() {
               </Button>
               <Button 
                 size="sm" 
-                className="bg-plant-500 hover:bg-plant-600 text-white"
+                className={`${isPremium ? 'bg-amber-500 hover:bg-amber-600 text-black' : 'bg-plant-500 hover:bg-plant-600 text-white'}`}
                 onClick={() => navigate('/account')}
               >
-                <User className="w-4 h-4 mr-2" />
+                {isPremium && <Crown className="w-4 h-4 mr-1" />}
+                <User className="w-4 h-4 mr-1" />
                 My Account
               </Button>
             </div>

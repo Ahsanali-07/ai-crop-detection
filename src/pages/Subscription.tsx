@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Check, Crown, ChevronRight, AlertCircle } from 'lucide-react';
+import { Check, Crown, ChevronRight, AlertCircle, Star } from 'lucide-react';
 import { 
   Card, 
   CardContent, 
@@ -74,6 +74,9 @@ export default function Subscription() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // Simulated user subscription status - in a real app, this would come from your database
+  const userSubscription = localStorage.getItem('userSubscription') || 'free';
+
   if (!user) {
     navigate('/auth/login', { state: { from: '/subscription' } });
     return null;
@@ -85,9 +88,13 @@ export default function Subscription() {
     } else if (planId === 'enterprise') {
       toast.info('Our sales team will contact you shortly');
     } else {
-      toast.success(`You selected the ${planId} plan`);
-      // Here you would typically redirect to a payment page
-      // navigate('/payment', { state: { plan: planId } });
+      // Redirect to payment page with plan details
+      navigate('/payment', { 
+        state: { 
+          plan: planId,
+          price: subscriptionPlans.find(p => p.id === planId)?.price
+        }
+      });
     }
   };
 
@@ -103,6 +110,13 @@ export default function Subscription() {
               Upgrade your PlantCare experience with advanced features and premium benefits. 
               Choose the plan that's right for you.
             </p>
+            
+            {userSubscription !== 'free' && (
+              <div className="inline-flex items-center gap-2 bg-amber-900/30 text-amber-300 px-4 py-2 rounded-full border border-amber-800/50 mt-4">
+                <Crown className="h-5 w-5 text-amber-400" />
+                <span className="font-medium">You are currently on the {userSubscription} plan</span>
+              </div>
+            )}
           </div>
           
           <div className="grid gap-8 md:grid-cols-3">
@@ -111,11 +125,20 @@ export default function Subscription() {
                 key={plan.id} 
                 className={`bg-zinc-900/50 border-zinc-800 relative flex flex-col h-full transition-all ${
                   plan.recommended ? 'ring-2 ring-plant-500' : ''
+                } ${
+                  userSubscription === plan.id ? 'ring-2 ring-amber-500' : ''
                 }`}
               >
                 {plan.recommended && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-plant-500 text-black text-xs font-bold px-4 py-1 rounded-full">
                     RECOMMENDED
+                  </div>
+                )}
+                
+                {userSubscription === plan.id && (
+                  <div className="absolute -top-3 right-3 bg-amber-500 text-black text-xs font-bold px-4 py-1 rounded-full flex items-center gap-1">
+                    <Star className="h-3 w-3" />
+                    CURRENT
                   </div>
                 )}
                 
@@ -148,17 +171,21 @@ export default function Subscription() {
                 <CardFooter>
                   <Button 
                     onClick={() => handleSubscribe(plan.id)}
-                    disabled={plan.disabled}
+                    disabled={userSubscription === plan.id}
                     className={`w-full ${
                       plan.recommended 
                         ? 'bg-plant-500 hover:bg-plant-600 text-white' 
                         : plan.id === 'free' 
                           ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
                           : 'bg-zinc-800 hover:bg-zinc-700 text-white'
+                    } ${
+                      userSubscription === plan.id 
+                        ? 'bg-amber-500 hover:bg-amber-600 text-black cursor-default'
+                        : ''
                     }`}
                   >
-                    {plan.buttonText}
-                    {!plan.disabled && <ChevronRight className="h-4 w-4 ml-2" />}
+                    {userSubscription === plan.id ? 'Current Plan' : plan.buttonText}
+                    {!plan.disabled && userSubscription !== plan.id && <ChevronRight className="h-4 w-4 ml-2" />}
                   </Button>
                 </CardFooter>
               </Card>
